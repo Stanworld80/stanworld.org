@@ -10,7 +10,7 @@
 		<p>
 			<a href="https://stanvision.stanworld.org"> Stan's vision : a blog</a><br/>
 		</p>
-		<h2>Je fais des expérimentations et des démonstrations au sujet de l'Intelligence Artificielle </h2>
+		<h2>Je fais des expérimentations et des démonstrations au sujet de l'Intelligence Artificielle : </h2>
 		<p>
 			<a href="https://guessnumber.stanworld.org">Guessnumber</a><br/>
 		</p>
