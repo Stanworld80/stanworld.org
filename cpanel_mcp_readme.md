@@ -16,7 +16,13 @@ Since some hosting providers (like o2switch) restrict the creation of API Tokens
 
 ### Method A: Regular cPanel Password (e.g. if API Tokens are disabled)
 You can authenticate using your normal cPanel username and password. 
-* *Note: The password is saved locally on your machine, so it remains secure.*
+* **Security Recommendation**: Instead of writing the password inside the Antigravity `config.json` file, you can save it in a local **`.env`** file.
+  1. Create a file named `.env` in the same directory as the script (`c:/Users/stani/stanworld.org/.env`).
+  2. Write your password inside it:
+     ```ini
+     CPANEL_PASSWORD=votre_mot_de_passe
+     ```
+  3. Because `.env` is already configured in `.gitignore`, this file will remain local to your computer and will never be pushed to your GitHub repository! The Python script will automatically detect and load it on startup.
 
 ### Method B: cPanel API Token (Recommended if enabled)
 1. Go to your cPanel Dashboard -> **Manage API Tokens** (Gérer les jetons d'API).

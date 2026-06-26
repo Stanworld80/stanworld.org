@@ -5,6 +5,16 @@ import urllib.parse
 import os
 import base64
 
+# Load local .env file if present in the same directory as this script
+env_path = os.path.join(os.path.dirname(__file__), ".env")
+if os.path.exists(env_path):
+    with open(env_path, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                key, val = line.split("=", 1)
+                os.environ[key.strip()] = val.strip()
+
 # Configuration (can be overridden via environment variables or .env file)
 CPANEL_HOST = os.environ.get("CPANEL_HOST", "https://node3-eu.o2switch.net:2083") # Example o2switch host
 CPANEL_USER = os.environ.get("CPANEL_USER", "stanworl")
