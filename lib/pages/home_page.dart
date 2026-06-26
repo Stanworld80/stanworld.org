@@ -28,7 +28,7 @@ class StanworldHomePage extends StatelessWidget {
       MinimalistShowcaseCard(
         title: "Stan's Vision",
         description:
-            "Blog personnel traitant des paradigmes de programmation, de la qualité logicielle et des architectures modernes.",
+            "Blog personnel traitant de considérations subjectives et imaginaires potentiellement réalistes.",
         actionLabel: "Consulter les articles",
         url: "https://stanvision.stanworld.org",
         onTap: () => _launchUrl("https://stanvision.stanworld.org"),
