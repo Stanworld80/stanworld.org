@@ -15,7 +15,129 @@ class StanworldHomePage extends StatelessWidget {
     }
   }
 
-  List<Widget> _buildShowcaseItems() {
+  void _showProductsDialog(BuildContext context) {
+    final theme = Theme.of(context);
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero,
+          ),
+          backgroundColor: theme.colorScheme.surface,
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 500),
+            padding: const EdgeInsets.all(40),
+            decoration: BoxDecoration(
+              border: Border.all(color: theme.colorScheme.outline, width: 1),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "NOS PRODUITS",
+                  style: theme.textTheme.displayMedium?.copyWith(
+                    fontSize: 22,
+                    letterSpacing: 4.0,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Divider(),
+                const SizedBox(height: 24),
+                _buildProductItem(
+                  context,
+                  title: "E-boutique Template",
+                  description: "Template moderne et performant pour le commerce électronique.",
+                  url: "https://ebt.stanworld.org",
+                ),
+                const SizedBox(height: 20),
+                _buildProductItem(
+                  context,
+                  title: "Finance Manager",
+                  description: "Solution intuitive de gestion et suivi des finances personnelles.",
+                  url: "https://financemanager.stanworld.org",
+                ),
+                const SizedBox(height: 20),
+                _buildProductItem(
+                  context,
+                  title: "WebBaseWithUser",
+                  description: "Architecture de base pour applications web avec authentification.",
+                  url: "https://webbasewithuser.stanworld.org",
+                ),
+                const SizedBox(height: 32),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: TextButton.styleFrom(
+                      foregroundColor: theme.colorScheme.primary,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.zero,
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    ),
+                    child: Text(
+                      "FERMER",
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildProductItem(
+    BuildContext context, {
+    required String title,
+    required String description,
+    required String url,
+  }) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                Navigator.of(context).pop();
+                _launchUrl(url);
+              },
+              child: Text(
+                "Visiter",
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.secondary,
+                  decoration: TextDecoration.underline,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Text(
+          description,
+          style: theme.textTheme.bodyMedium,
+        ),
+      ],
+    );
+  }
+
+  List<Widget> _buildShowcaseItems(BuildContext context) {
     return [
       MinimalistShowcaseCard(
         title: "Création de Produits",
@@ -23,7 +145,7 @@ class StanworldHomePage extends StatelessWidget {
             "Conception et édition de logiciels innovants, d'outils web de pointe et d'applications modernes axés sur la stabilité et la performance.",
         actionLabel: "Découvrir les produits",
         url: "https://stanislasselleinformatique.fr",
-        onTap: () => _launchUrl("https://stanislasselleinformatique.fr"),
+        onTap: () => _showProductsDialog(context),
       ),
       MinimalistShowcaseCard(
         title: "Stan's Vision",
@@ -56,7 +178,7 @@ class StanworldHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final isDesktop = screenSize.width > 950;
-    final showcaseItems = _buildShowcaseItems();
+    final showcaseItems = _buildShowcaseItems(context);
 
     return Scaffold(
       body: SafeArea(
