@@ -49,5 +49,5 @@ jobs:
           local-dir: ./build/web/
           # If o2switch defaults to the root of your domain's FTP folder, leave this as ./
           # If you need to deploy specifically to public_html/, change this to public_html/
-          server-dir: ./
+          server-dir: public_html/current/
           dangerous-clean-slate: false # Keep false to avoid deleting other files (e.g. subdomains/folders)
