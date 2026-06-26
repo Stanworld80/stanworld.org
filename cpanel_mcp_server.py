@@ -25,14 +25,26 @@ def log(msg):
     sys.stderr.write(f"[cPanel MCP] {msg}\n")
     sys.stderr.flush()
 
-def call_cpanel_api(module, function, params=None):
+def call_cpanel_api(module, function, params=None, api_version=3):
     if not CPANEL_TOKEN and not CPANEL_PASSWORD:
         return {"errors": ["Neither CPANEL_TOKEN nor CPANEL_PASSWORD is configured."]}
         
-    url = f"{CPANEL_HOST.rstrip('/')}/execute/{module}/{function}"
-    if params:
-        query_string = urllib.parse.urlencode(params)
+    if api_version == 2:
+        url = f"{CPANEL_HOST.rstrip('/')}/json-api/cpanel"
+        merged_params = {
+            "cpanel_jsonapi_apiversion": "2",
+            "cpanel_jsonapi_module": module,
+            "cpanel_jsonapi_func": function
+        }
+        if params:
+            merged_params.update(params)
+        query_string = urllib.parse.urlencode(merged_params)
         url = f"{url}?{query_string}"
+    else:
+        url = f"{CPANEL_HOST.rstrip('/')}/execute/{module}/{function}"
+        if params:
+            query_string = urllib.parse.urlencode(params)
+            url = f"{url}?{query_string}"
         
     log(f"Calling UAPI: {url}")
     req = urllib.request.Request(url)
@@ -49,6 +61,8 @@ def call_cpanel_api(module, function, params=None):
     try:
         with urllib.request.urlopen(req) as response:
             res_data = json.loads(response.read().decode("utf-8"))
+            if api_version == 2:
+                return res_data.get("cpanelresult", res_data)
             return res_data
     except Exception as e:
         log(f"HTTP Request failed: {e}")
@@ -99,11 +113,11 @@ def handle_list_tools():
 
 def handle_call_tool(name, arguments):
     if name == "cpanel_list_subdomains":
-        res = call_cpanel_api("SubDomain", "listsubdomains")
+        res = call_cpanel_api("SubDomain", "listsubdomains", api_version=2)
         if res.get("errors"):
             return f"Error: {res.get('errors')}"
         data = res.get("data", [])
-        subdomains = [f"{item['subdomain']}.{item['domain']} -> {item['dir']}" for item in data]
+        subdomains = [f"{item['subdomain']}.{item['rootdomain']} -> {item['dir']}" for item in data]
         return "\n".join(subdomains) if subdomains else "No subdomains found."
         
     elif name == "cpanel_create_subdomain":
@@ -111,29 +125,49 @@ def handle_call_tool(name, arguments):
         domain = arguments.get("domain")
         directory = arguments.get("dir")
         params = {
-            "subdomain": sub,
-            "domain": domain,
+            "domain": sub,
+            "rootdomain": domain,
             "dir": directory
         }
-        res = call_cpanel_api("SubDomain", "addsubdomain", params)
+        res = call_cpanel_api("SubDomain", "addsubdomain", params, api_version=2)
         if res.get("errors"):
             return f"Failed to create subdomain: {res.get('errors')}"
-        return f"Subdomain {sub}.{domain} successfully created pointing to {directory}!"
+        data = res.get("data", [{}])
+        reason = data[0].get("reason", "") if data else ""
+        result = data[0].get("result", 0) if data else 0
+        if result == 1:
+            return f"Subdomain {sub}.{domain} successfully created pointing to {directory}! Reason: {reason}"
+        else:
+            return f"Failed to create subdomain: {reason}"
         
     elif name == "cpanel_list_databases":
-        res = call_cpanel_api("Mysql", "list_dbs")
+        res = call_cpanel_api("Mysql", "list_databases")
         if res.get("errors"):
             return f"Error: {res.get('errors')}"
         data = res.get("data", [])
-        dbs = [f"- {db['database']} ({db['size_formatted']})" for db in data]
+        dbs = []
+        for db in data:
+            name = db.get("database", "")
+            usage = db.get("disk_usage", 0)
+            usage_mb = usage / (1024 * 1024)
+            dbs.append(f"- {name} ({usage_mb:.2f} MB)")
         return "\n".join(dbs) if dbs else "No databases found."
         
     elif name == "cpanel_get_disk_usage":
-        res = call_cpanel_api("DiskUsage", "fetch_disk_usage")
+        res = call_cpanel_api("DiskUsage", "fetchdiskusage", api_version=2)
         if res.get("errors"):
             return f"Error: {res.get('errors')}"
-        data = res.get("data", {})
-        return f"Disk usage: {json.dumps(data)}"
+        data = res.get("data", [])
+        total_usage = 0
+        for item in data:
+            if item.get("name") == f"/home/{CPANEL_USER}":
+                total_usage = item.get("user_contained_usage", 0)
+                break
+        if not total_usage and data:
+            total_usage = data[0].get("user_contained_usage", 0)
+            
+        total_usage_gb = total_usage / (1024 * 1024 * 1024)
+        return f"Total account disk usage: {total_usage_gb:.2f} GB"
         
     else:
         return f"Unknown tool: {name}"
@@ -149,7 +183,25 @@ def main():
             method = request.get("method")
             req_id = request.get("id")
             
-            if method == "tools/list":
+            if method == "initialize":
+                response = {
+                    "jsonrpc": "2.0",
+                    "result": {
+                        "protocolVersion": request.get("params", {}).get("protocolVersion", "2024-11-05"),
+                        "capabilities": {
+                            "tools": {}
+                        },
+                        "serverInfo": {
+                            "name": "cpanel-mcp-server",
+                            "version": "1.0.0"
+                        }
+                    },
+                    "id": req_id
+                }
+            elif method == "notifications/initialized":
+                # This is a notification, do not reply
+                continue
+            elif method == "tools/list":
                 response = {
                     "jsonrpc": "2.0",
                     "result": handle_list_tools(),
@@ -170,14 +222,17 @@ def main():
                     "id": req_id
                 }
             else:
+                if req_id is None:
+                    continue
                 response = {
                     "jsonrpc": "2.0",
                     "error": {"code": -32601, "message": "Method not found"},
                     "id": req_id
                 }
             
-            sys.stdout.write(json.dumps(response) + "\n")
-            sys.stdout.flush()
+            if req_id is not None:
+                sys.stdout.write(json.dumps(response) + "\n")
+                sys.stdout.flush()
         except Exception as e:
             log(f"Error parsing request: {e}")
 

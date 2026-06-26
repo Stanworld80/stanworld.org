@@ -7,6 +7,6 @@ void main() {
     await tester.pumpWidget(const StanworldApp());
 
     // Verify that the title/brand is displayed.
-    expect(find.text('STANWORLD'), findsOneWidget);
+    expect(find.text('STANISLAS SELLE'), findsOneWidget);
   });
 }

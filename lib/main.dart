@@ -12,32 +12,45 @@ class StanworldApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Stanworld - Stanislas Selle',
+      title: 'Stanislas Selle Informatique',
       debugShowCheckedModeBanner: false,
-      themeMode: ThemeMode.dark, // Always dark mode by default for premium developer aesthetic
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF0F0F11),
-        colorScheme: const ColorScheme.dark(
-          primary: Color(0xFF00F0FF), // Cyber Cyan
-          secondary: Color(0xFF9E00FF), // Electric Violet
-          surface: Color(0xFF18181C),
-          onSurface: Color(0xFFE4E4E7),
+      themeMode: ThemeMode.light, // Pure light minimalist theme as requested
+      theme: ThemeData(
+        brightness: Brightness.light,
+        scaffoldBackgroundColor: const Color(0xFFF9F9F9),
+        colorScheme: const ColorScheme.light(
+          primary: Color(0xFF111111), // Ink Black
+          secondary: Color(0xFF0B192C), // Midnight Navy
+          surface: Colors.white,
+          onSurface: Color(0xFF111111),
         ),
-        textTheme: GoogleFonts.outfitTextTheme(ThemeData.dark().textTheme).copyWith(
-          displayLarge: GoogleFonts.outfit(
-            fontWeight: FontWeight.w800,
-            fontSize: 48,
-            letterSpacing: -1.0,
-            color: Colors.white,
-          ),
-          titleMedium: GoogleFonts.inter(
-            fontWeight: FontWeight.w400,
-            fontSize: 16,
-            height: 1.5,
-            color: const Color(0xFFA1A1AA),
-          ),
-        ),
+        textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme)
+            .copyWith(
+              displayLarge: GoogleFonts.cormorantGaramond(
+                fontWeight: FontWeight.w300,
+                fontSize: 44,
+                letterSpacing: 6.0,
+                color: const Color(0xFF111111),
+              ),
+              displayMedium: GoogleFonts.cormorantGaramond(
+                fontWeight: FontWeight.w400,
+                fontSize: 28,
+                letterSpacing: 2.0,
+                color: const Color(0xFF111111),
+              ),
+              titleLarge: GoogleFonts.inter(
+                fontWeight: FontWeight.w600,
+                fontSize: 18,
+                letterSpacing: 1.0,
+                color: const Color(0xFF111111),
+              ),
+              bodyLarge: GoogleFonts.inter(
+                fontWeight: FontWeight.w400,
+                fontSize: 15,
+                height: 1.6,
+                color: const Color(0xFF333333),
+              ),
+            ),
       ),
       home: const StanworldHomePage(),
     );
@@ -57,213 +70,190 @@ class StanworldHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    final isDesktop = screenSize.width > 900;
-    final isTablet = screenSize.width > 600 && screenSize.width <= 900;
+    final isDesktop = screenSize.width > 950;
 
     return Scaffold(
-      body: Stack(
-        children: [
-          // Premium subtle background gradient & ambient glow spots
-          Positioned.fill(
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF08080A),
-                    Color(0xFF0F0F13),
-                    Color(0xFF14121A),
-                  ],
-                ),
-              ),
-            ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(
+            horizontal: isDesktop ? screenSize.width * 0.12 : 24,
+            vertical: 60,
           ),
-          // Glow Spot 1
-          Positioned(
-            top: -150,
-            left: -150,
+          child: Center(
             child: Container(
-              width: 500,
-              height: 500,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: const Color(0xFF00F0FF).withOpacity(0.08),
-                backgroundBlendMode: BlendMode.screen,
-              ),
-              child: const SizedBox(),
-            ),
-          ),
-          // Glow Spot 2
-          Positioned(
-            bottom: -200,
-            right: -200,
-            child: Container(
-              width: 600,
-              height: 600,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: const Color(0xFF9E00FF).withOpacity(0.08),
-                backgroundBlendMode: BlendMode.screen,
-              ),
-              child: const SizedBox(),
-            ),
-          ),
-          // Scrollable content
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(
-                horizontal: isDesktop ? screenSize.width * 0.1 : 24,
-                vertical: 40,
-              ),
-              child: Center(
-                child: Container(
-                  constraints: const BoxConstraints(maxWidth: 1200),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Header & Language/Social Row
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                width: 12,
-                                height: 12,
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Color(0xFF00F0FF),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0xFF00F0FF),
-                                      blurRadius: 10,
-                                      spreadRadius: 1,
-                                    )
-                                  ]
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Text(
-                                'STANWORLD',
-                                style: GoogleFonts.outfit(
-                                  fontWeight: FontWeight.w900,
-                                  fontSize: 20,
-                                  letterSpacing: 2.0,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.code, color: Colors.white70),
-                                tooltip: 'GitHub',
-                                onPressed: () => _launchUrl('https://github.com/Stanworld80'),
-                              ),
-                              const SizedBox(width: 8),
-                              IconButton(
-                                icon: const Icon(Icons.alternate_email, color: Colors.white70),
-                                tooltip: 'Email',
-                                onPressed: () => _launchUrl('mailto:contact@stanworld.org'),
-                              ),
-                            ],
-                          )
-                        ],
-                      ),
-                      const SizedBox(height: 80),
+              constraints: const BoxConstraints(maxWidth: 1100),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Logo Brand Block & Slogan Row
+                  isDesktop
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [_buildBrandBlock(), _buildSloganText()],
+                        )
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildBrandBlock(),
+                            const SizedBox(height: 16),
+                            _buildSloganText(),
+                          ],
+                        ),
 
-                      // Hero section with glowing text
+                  const SizedBox(height: 40),
+                  const Divider(color: Color(0xFFE5E5E5), thickness: 1),
+                  const SizedBox(height: 80),
+
+                  // Hero Text & Introduction
+                  Container(
+                    constraints: const BoxConstraints(maxWidth: 800),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Créateur de produits informatiques",
+                          style: GoogleFonts.cormorantGaramond(
+                            fontSize: 36,
+                            fontWeight: FontWeight.w400,
+                            color: const Color(0xFF0B192C),
+                            letterSpacing: 1.0,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        Text(
+                          "Éditeur indépendant et ingénieur logiciel, je conçois et développe des produits informatiques innovants. Mon approche privilégie la rigueur technique, la clarté architecturale et l'élégance du code pour proposer des solutions stables et performantes.",
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 100),
+
+                  // Showcase Grid/List
+                  isDesktop
+                      ? GridView.count(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          crossAxisCount: 2,
+                          childAspectRatio: 1.6,
+                          crossAxisSpacing: 40,
+                          mainAxisSpacing: 40,
+                          children: _buildShowcaseItems(),
+                        )
+                      : ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: 4,
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(height: 30),
+                          itemBuilder: (context, index) =>
+                              _buildShowcaseItems()[index],
+                        ),
+
+                  const SizedBox(height: 120),
+
+                  // Footer / Contacts
+                  const Divider(color: Color(0xFFE5E5E5), thickness: 1),
+                  const SizedBox(height: 40),
+                  Flex(
+                    direction: isDesktop ? Axis.horizontal : Axis.vertical,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: isDesktop
+                        ? CrossAxisAlignment.center
+                        : CrossAxisAlignment.start,
+                    children: [
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          ShaderMask(
-                            shaderCallback: (bounds) => const LinearGradient(
-                              colors: [Color(0xFF00F0FF), Color(0xFF9E00FF)],
-                            ).createShader(bounds),
-                            child: Text(
-                              'Stanislas Selle',
-                              style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                                color: Colors.white, // Required for ShaderMask
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
                           Text(
-                            "Ingénierie Informatique & Technologies Web",
-                            style: GoogleFonts.outfit(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 22,
-                              color: const Color(0xFFE4E4E7),
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          Container(
-                            constraints: const BoxConstraints(maxWidth: 700),
-                            child: Text(
-                              "Expert en ingénierie informatique. Je conçois des solutions logicielles sur-mesure, mène des expérimentations en intelligence artificielle et développe des applications web et mobiles innovantes.",
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 80),
-
-                      // Grid or List of Sections
-                      isDesktop
-                          ? GridView.count(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              crossAxisCount: 2,
-                              childAspectRatio: 1.5,
-                              crossAxisSpacing: 24,
-                              mainAxisSpacing: 24,
-                              children: _buildCards(),
-                            )
-                          : ListView.separated(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: 4,
-                              separatorBuilder: (context, index) => const SizedBox(height: 20),
-                              itemBuilder: (context, index) => _buildCards()[index],
-                            ),
-
-                      const SizedBox(height: 120),
-
-                      // Footer
-                      const Divider(color: Color(0xFF27272A)),
-                      const SizedBox(height: 30),
-                      Flex(
-                        direction: isDesktop ? Axis.horizontal : Axis.vertical,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: isDesktop ? CrossAxisAlignment.center : CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '© 2026 Stanislas Selle. Tous droits réservés.',
+                            "STANISLAS SELLE INFORMATIQUE",
                             style: GoogleFonts.inter(
-                              fontSize: 14,
-                              color: const Color(0xFF71717A),
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 2.0,
+                              color: const Color(0xFF111111),
                             ),
                           ),
-                          if (!isDesktop) const SizedBox(height: 16),
-                          Row(
-                            children: [
-                              _footerLink('stanworld.org', 'https://www.stanworld.org'),
-                              const SizedBox(width: 20),
-                              _footerLink('stanislasselleinformatique.fr', 'https://stanislasselleinformatique.fr'),
-                            ],
+                          const SizedBox(height: 8),
+                          Text(
+                            "SIRET XXXXXXXXXXX — France — Micro-entreprise",
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              color: const Color(0xFF666666),
+                            ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
+                      if (!isDesktop) const SizedBox(height: 24),
+                      Row(
+                        children: [
+                          _footerLink(
+                            "GitHub",
+                            "https://github.com/Stanworld80",
+                          ),
+                          const SizedBox(width: 30),
+                          _footerLink(
+                            "Email",
+                            "mailto:contact@stanislasselleinformatique.fr",
+                          ),
+                          const SizedBox(width: 30),
+                          _footerLink(
+                            "Légal",
+                            "https://stanislasselleinformatique.fr",
+                          ),
+                        ],
+                      ),
                     ],
                   ),
-                ),
+                  const SizedBox(height: 40),
+                ],
               ),
             ),
           ),
-        ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBrandBlock() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "STANISLAS SELLE",
+          style: GoogleFonts.cormorantGaramond(
+            fontWeight: FontWeight.w300,
+            fontSize: 28,
+            letterSpacing: 5.0,
+            color: const Color(0xFF111111),
+          ),
+        ),
+        const SizedBox(height: 2),
+        Padding(
+          padding: const EdgeInsets.only(left: 2.0),
+          child: Text(
+            "INFORMATIQUE",
+            style: GoogleFonts.inter(
+              fontWeight: FontWeight.w400,
+              fontSize: 10,
+              letterSpacing: 7.5,
+              color: const Color(0xFF666666),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSloganText() {
+    return Text(
+      "L'ingénierie logicielle, l'élégance en plus.",
+      style: GoogleFonts.cormorantGaramond(
+        fontSize: 16,
+        fontStyle: FontStyle.italic,
+        color: const Color(0xFF666666),
       ),
     );
   }
@@ -274,81 +264,73 @@ class StanworldHomePage extends StatelessWidget {
       child: Text(
         label,
         style: GoogleFonts.inter(
-          fontSize: 14,
-          color: const Color(0xFFA1A1AA),
+          fontSize: 13,
+          color: const Color(0xFF111111),
           decoration: TextDecoration.underline,
         ),
       ),
     );
   }
 
-  List<Widget> _buildCards() {
+  List<Widget> _buildShowcaseItems() {
     return [
-      InteractiveServiceCard(
-        title: "Ingénierie & Services",
-        subtitle: "Stanislas Selle Informatique",
-        description: "Prestations d'expertise, d'audit technique et de développement de solutions logicielles professionnelles adaptées à vos besoins.",
-        icon: Icons.business_center_outlined,
-        actionLabel: "Découvrir les services",
-        accentColor: const Color(0xFF00F0FF),
-        onTap: () => _launchUrl('https://stanislasselleinformatique.fr'),
+      MinimalistShowcaseCard(
+        title: "Création de Produits",
+        description:
+            "Conception et édition de logiciels innovants, d'outils web de pointe et d'applications modernes axés sur la stabilité et la performance.",
+        actionLabel: "Découvrir les produits",
+        url: "https://stanislasselleinformatique.fr",
+        onTap: () => _launchUrl("https://stanislasselleinformatique.fr"),
       ),
-      InteractiveServiceCard(
+      MinimalistShowcaseCard(
         title: "Stan's Vision",
-        subtitle: "Mon Blog Technologique",
-        description: "Partage de retours d'expérience, articles de veille technologique et analyses sur le développement et le futur de l'ingénierie.",
-        icon: Icons.article_outlined,
-        actionLabel: "Lire le blog",
-        accentColor: const Color(0xFF9E00FF),
-        onTap: () => _launchUrl('https://stanvision.stanworld.org'),
+        description:
+            "Blog personnel traitant des paradigmes de programmation, de la qualité logicielle et des architectures modernes.",
+        actionLabel: "Consulter les articles",
+        url: "https://stanvision.stanworld.org",
+        onTap: () => _launchUrl("https://stanvision.stanworld.org"),
       ),
-      InteractiveServiceCard(
+      MinimalistShowcaseCard(
         title: "Expérimentations IA",
-        subtitle: "Guessnumber & IA Demos",
-        description: "Démonstrations interactives et projets d'expérimentation autour de l'intelligence artificielle et du machine learning.",
-        icon: Icons.psychology_outlined,
+        description:
+            "Laboratoire de démonstration technique d'algorithmes et de modèles, illustré par le projet Guessnumber.",
         actionLabel: "Lancer Guessnumber",
-        accentColor: const Color(0xFFFF007A),
-        onTap: () => _launchUrl('https://guessnumber.stanworld.org'),
+        url: "https://guessnumber.stanworld.org",
+        onTap: () => _launchUrl("https://guessnumber.stanworld.org"),
       ),
-      InteractiveServiceCard(
-        title: "Outils & Services",
-        subtitle: "Mon Calendrier en ligne",
-        description: "Des outils et micro-services web utiles mis à disposition du public, conçus pour la productivité au quotidien.",
-        icon: Icons.calendar_month_outlined,
-        actionLabel: "Accéder au calendrier",
-        accentColor: const Color(0xFF00FF85),
-        onTap: () => _launchUrl('https://www.stanworld.org/calendar'),
+      MinimalistShowcaseCard(
+        title: "Services en ligne",
+        description:
+            "Utilitaires web et outils de productivité hébergés à l'usage des professionnels, incluant notre outil de calendrier.",
+        actionLabel: "Accéder au Calendrier",
+        url: "https://www.stanworld.org/calendar",
+        onTap: () => _launchUrl("https://www.stanworld.org/calendar"),
       ),
     ];
   }
 }
 
-class InteractiveServiceCard extends StatefulWidget {
+class MinimalistShowcaseCard extends StatefulWidget {
   final String title;
-  final String subtitle;
   final String description;
-  final IconData icon;
   final String actionLabel;
-  final Color accentColor;
+  final String url;
   final VoidCallback onTap;
 
-  const InteractiveServiceCard({
+  const MinimalistShowcaseCard({
     super.key,
     required this.title,
-    required this.subtitle,
     required this.description,
-    required this.icon,
     required this.actionLabel,
-    required this.accentColor,
+    required this.url,
     required this.onTap,
   });
 
   @override
-  State<InteractiveServiceCard> createState() => _InteractiveServiceCardState();
+  State<MinimalistShowcaseCard> createState() => _MinimalistShowcaseCardState();
 }
 
-class _InteractiveServiceCardState extends State<InteractiveServiceCard> with SingleTickerProviderStateMixin {
+class _MinimalistShowcaseCardState extends State<MinimalistShowcaseCard> {
   bool _isHovered = false;
 
   @override
@@ -359,28 +341,19 @@ class _InteractiveServiceCardState extends State<InteractiveServiceCard> with Si
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: widget.onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.easeInOut,
-          transform: _isHovered 
-              ? (Matrix4.identity()..translate(0, -8, 0)..scale(1.02)) 
-              : Matrix4.identity(),
+        child: Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF18181C),
-            borderRadius: BorderRadius.circular(20),
+            color: Colors.white,
+            borderRadius:
+                BorderRadius.zero, // Sharp square corners as requested
             border: Border.all(
-              color: _isHovered ? widget.accentColor.withOpacity(0.5) : const Color(0xFF27272A),
-              width: 1.5,
+              color: _isHovered
+                  ? const Color(0xFF111111)
+                  : const Color(0xFFE5E5E5),
+              width: 1.0,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: _isHovered ? widget.accentColor.withOpacity(0.15) : Colors.black.withOpacity(0.2),
-                blurRadius: _isHovered ? 25 : 12,
-                offset: const Offset(0, 8),
-              ),
-            ],
           ),
-          padding: const EdgeInsets.all(28),
+          padding: const EdgeInsets.all(32),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -388,76 +361,59 @@ class _InteractiveServiceCardState extends State<InteractiveServiceCard> with Si
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Icon & Top decoration
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Icon(
-                        widget.icon,
-                        color: widget.accentColor,
-                        size: 32,
-                      ),
-                      AnimatedOpacity(
-                        duration: const Duration(milliseconds: 200),
-                        opacity: _isHovered ? 1.0 : 0.0,
-                        child: Icon(
-                          Icons.arrow_outward,
-                          color: widget.accentColor,
-                          size: 20,
-                        ),
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  // Titles
                   Text(
                     widget.title,
-                    style: GoogleFonts.outfit(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 20,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    widget.subtitle,
-                    style: GoogleFonts.outfit(
+                    style: GoogleFonts.cormorantGaramond(
+                      fontSize: 22,
                       fontWeight: FontWeight.w500,
-                      fontSize: 14,
-                      color: widget.accentColor.withOpacity(0.9),
+                      letterSpacing: 1.0,
+                      color: const Color(0xFF111111),
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  // Description
+                  const SizedBox(height: 16),
                   Text(
                     widget.description,
                     style: GoogleFonts.inter(
-                      fontSize: 14,
-                      height: 1.45,
-                      color: const Color(0xFFA1A1AA),
+                      fontSize: 13,
+                      height: 1.5,
+                      color: const Color(0xFF666666),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
-              // Call to Action
-              Row(
-                children: [
-                  Text(
-                    widget.actionLabel,
-                    style: GoogleFonts.inter(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13,
-                      color: Colors.white,
+              const SizedBox(height: 20),
+              // Sharp Action Button
+              Container(
+                decoration: BoxDecoration(
+                  color: _isHovered
+                      ? const Color(0xFF0B192C)
+                      : const Color(0xFF111111),
+                  borderRadius: BorderRadius.zero, // Sharp square corners
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 10,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      widget.actionLabel,
+                      style: GoogleFonts.inter(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 1.0,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 6),
-                  Icon(
-                    Icons.chevron_right,
-                    size: 16,
-                    color: _isHovered ? widget.accentColor : Colors.white70,
-                  ),
-                ],
+                    const SizedBox(width: 8),
+                    const Icon(
+                      Icons.arrow_right_alt,
+                      color: Colors.white,
+                      size: 16,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
