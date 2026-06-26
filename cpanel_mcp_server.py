@@ -3,19 +3,21 @@ import json
 import urllib.request
 import urllib.parse
 import os
+import base64
 
 # Configuration (can be overridden via environment variables or .env file)
 CPANEL_HOST = os.environ.get("CPANEL_HOST", "https://node3-eu.o2switch.net:2083") # Example o2switch host
 CPANEL_USER = os.environ.get("CPANEL_USER", "stanworl")
 CPANEL_TOKEN = os.environ.get("CPANEL_TOKEN", "")
+CPANEL_PASSWORD = os.environ.get("CPANEL_PASSWORD", "")
 
 def log(msg):
     sys.stderr.write(f"[cPanel MCP] {msg}\n")
     sys.stderr.flush()
 
 def call_cpanel_api(module, function, params=None):
-    if not CPANEL_TOKEN:
-        return {"errors": ["CPANEL_TOKEN is not configured."]}
+    if not CPANEL_TOKEN and not CPANEL_PASSWORD:
+        return {"errors": ["Neither CPANEL_TOKEN nor CPANEL_PASSWORD is configured."]}
         
     url = f"{CPANEL_HOST.rstrip('/')}/execute/{module}/{function}"
     if params:
@@ -24,7 +26,15 @@ def call_cpanel_api(module, function, params=None):
         
     log(f"Calling UAPI: {url}")
     req = urllib.request.Request(url)
-    req.add_header("Authorization", f"cpanel {CPANEL_USER}:{CPANEL_TOKEN}")
+    
+    if CPANEL_TOKEN:
+        req.add_header("Authorization", f"cpanel {CPANEL_USER}:{CPANEL_TOKEN}")
+    else:
+        # Use HTTP Basic Auth with regular cPanel password
+        auth_str = f"{CPANEL_USER}:{CPANEL_PASSWORD}"
+        auth_bytes = auth_str.encode("utf-8")
+        auth_b64 = base64.b64encode(auth_bytes).decode("utf-8")
+        req.add_header("Authorization", f"Basic {auth_b64}")
     
     try:
         with urllib.request.urlopen(req) as response:
@@ -113,7 +123,6 @@ def handle_call_tool(name, arguments):
         if res.get("errors"):
             return f"Error: {res.get('errors')}"
         data = res.get("data", {})
-        # Simple extraction of disk information
         return f"Disk usage: {json.dumps(data)}"
         
     else:

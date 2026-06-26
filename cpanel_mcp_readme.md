@@ -10,31 +10,45 @@ This standalone Python script implements the **Model Context Protocol (MCP)**, a
 
 ---
 
-## Step 1: Create a cPanel API Token
-1. Go to your cPanel Dashboard.
-2. Under the **Sécurité** (Security) section, click on **Manage API Tokens** (Gérer les jetons d'API).
-3. Click **Create** (Créer) and set a name (e.g. `antigravity-mcp`).
-4. Select/grant the required permissions:
-   - **Subdomains / Domain Management** (Gestion des sous-domaines).
-   - **MySQL / Database Management** (optional, for listing databases).
-5. Copy the generated **API Token** immediately (it will only be shown once).
+## Authentication Methods
+
+Since some hosting providers (like o2switch) restrict the creation of API Tokens on shared packages, this server supports two methods of authentication:
+
+### Method A: Regular cPanel Password (e.g. if API Tokens are disabled)
+You can authenticate using your normal cPanel username and password. 
+* *Note: The password is saved locally on your machine, so it remains secure.*
+
+### Method B: cPanel API Token (Recommended if enabled)
+1. Go to your cPanel Dashboard -> **Manage API Tokens** (Gérer les jetons d'API).
+2. Click **Create** and name it `antigravity-mcp`.
+3. Select/grant permissions for Domain Management and MySQL.
+4. Copy the generated API Token.
 
 ---
 
-## Step 2: Configure Environment Variables
-You need to pass the configuration to the python script. You can set these environment variables globally on your Windows machine, or run the server with them:
-* `CPANEL_HOST`: `https://node3-eu.o2switch.net:2083` (Replace with your actual o2switch cPanel URL address, which you can see in your browser bar when logged into cPanel).
-* `CPANEL_USER`: `stanworl`
-* `CPANEL_TOKEN`: *[Your generated API Token]*
+## Step 2: Register the MCP Server in Antigravity
 
----
+To register this tool, open the Antigravity configuration file located under:
+`C:\Users\stani\.gemini\antigravity-ide\config.json` (or `settings.json`).
 
-## Step 3: Register the MCP Server in Antigravity
-To register this tool in your Antigravity client:
-1. Open the Antigravity configuration file. On your computer, it is located under:
-   `C:\Users\stani\.gemini\antigravity-ide\config.json` (or `settings.json`).
-2. Add the custom command server configuration under your `mcpServers` settings:
+### Configuration Example using cPanel Password (Method A):
+```json
+{
+  "mcpServers": {
+    "cpanel-mcp": {
+      "command": "python",
+      "args": ["c:/Users/stani/stanworld.org/cpanel_mcp_server.py"],
+      "env": {
+        "CPANEL_HOST": "https://node3-eu.o2switch.net:2083",
+        "CPANEL_USER": "stanworl",
+        "CPANEL_PASSWORD": "YOUR_CPANEL_PASSWORD"
+      }
+    }
+  }
+}
+```
 
+### Configuration Example using API Token (Method B):
 ```json
 {
   "mcpServers": {
@@ -51,7 +65,4 @@ To register this tool in your Antigravity client:
 }
 ```
 
-3. Restart the Antigravity IDE/editor.
-4. Antigravity will automatically load the new tools! You can then say:
-   - *"Liste mes sous-domaines."*
-   - *"Crée le sous-domaine staging.stanworld.org pointant vers public_html/staging."*
+3. Restart the Antigravity IDE/editor to load the new tools!
