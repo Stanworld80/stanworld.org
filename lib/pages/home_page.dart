@@ -77,6 +77,14 @@ class StanworldHomePage extends StatelessWidget {
                   const SizedBox(height: 80),
                   const HeroSection(),
                   const SizedBox(height: 100),
+                  Text(
+                    "PRODUITS",
+                    style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                          fontSize: 20,
+                          letterSpacing: 4.0,
+                        ),
+                  ),
+                  const SizedBox(height: 40),
                   isDesktop
                       ? GridView.count(
                           shrinkWrap: true,
