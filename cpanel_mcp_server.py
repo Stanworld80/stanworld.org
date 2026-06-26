@@ -1,0 +1,166 @@
+import sys
+import json
+import urllib.request
+import urllib.parse
+import os
+
+# Configuration (can be overridden via environment variables or .env file)
+CPANEL_HOST = os.environ.get("CPANEL_HOST", "https://node3-eu.o2switch.net:2083") # Example o2switch host
+CPANEL_USER = os.environ.get("CPANEL_USER", "stanworl")
+CPANEL_TOKEN = os.environ.get("CPANEL_TOKEN", "")
+
+def log(msg):
+    sys.stderr.write(f"[cPanel MCP] {msg}\n")
+    sys.stderr.flush()
+
+def call_cpanel_api(module, function, params=None):
+    if not CPANEL_TOKEN:
+        return {"errors": ["CPANEL_TOKEN is not configured."]}
+        
+    url = f"{CPANEL_HOST.rstrip('/')}/execute/{module}/{function}"
+    if params:
+        query_string = urllib.parse.urlencode(params)
+        url = f"{url}?{query_string}"
+        
+    log(f"Calling UAPI: {url}")
+    req = urllib.request.Request(url)
+    req.add_header("Authorization", f"cpanel {CPANEL_USER}:{CPANEL_TOKEN}")
+    
+    try:
+        with urllib.request.urlopen(req) as response:
+            res_data = json.loads(response.read().decode("utf-8"))
+            return res_data
+    except Exception as e:
+        log(f"HTTP Request failed: {e}")
+        return {"errors": [str(e)]}
+
+def handle_list_tools():
+    return {
+        "tools": [
+            {
+                "name": "cpanel_list_subdomains",
+                "description": "List all subdomains configured in cPanel.",
+                "inputSchema": {
+                  "type": "object",
+                  "properties": {}
+                }
+            },
+            {
+                "name": "cpanel_create_subdomain",
+                "description": "Create a new subdomain in cPanel.",
+                "inputSchema": {
+                  "type": "object",
+                  "properties": {
+                    "subdomain": {"type": "string", "description": "Subdomain prefix, e.g. 'staging'"},
+                    "domain": {"type": "string", "description": "Base domain, e.g. 'stanworld.org'"},
+                    "dir": {"type": "string", "description": "Document root path relative to home, e.g. 'public_html/staging'"}
+                  },
+                  "required": ["subdomain", "domain", "dir"]
+                }
+            },
+            {
+                "name": "cpanel_list_databases",
+                "description": "List all MySQL databases in cPanel.",
+                "inputSchema": {
+                  "type": "object",
+                  "properties": {}
+                }
+            },
+            {
+                "name": "cpanel_get_disk_usage",
+                "description": "Get server disk space usage statistics.",
+                "inputSchema": {
+                  "type": "object",
+                  "properties": {}
+                }
+            }
+        ]
+    }
+
+def handle_call_tool(name, arguments):
+    if name == "cpanel_list_subdomains":
+        res = call_cpanel_api("SubDomain", "listsubdomains")
+        if res.get("errors"):
+            return f"Error: {res.get('errors')}"
+        data = res.get("data", [])
+        subdomains = [f"{item['subdomain']}.{item['domain']} -> {item['dir']}" for item in data]
+        return "\n".join(subdomains) if subdomains else "No subdomains found."
+        
+    elif name == "cpanel_create_subdomain":
+        sub = arguments.get("subdomain")
+        domain = arguments.get("domain")
+        directory = arguments.get("dir")
+        params = {
+            "subdomain": sub,
+            "domain": domain,
+            "dir": directory
+        }
+        res = call_cpanel_api("SubDomain", "addsubdomain", params)
+        if res.get("errors"):
+            return f"Failed to create subdomain: {res.get('errors')}"
+        return f"Subdomain {sub}.{domain} successfully created pointing to {directory}!"
+        
+    elif name == "cpanel_list_databases":
+        res = call_cpanel_api("Mysql", "list_dbs")
+        if res.get("errors"):
+            return f"Error: {res.get('errors')}"
+        data = res.get("data", [])
+        dbs = [f"- {db['database']} ({db['size_formatted']})" for db in data]
+        return "\n".join(dbs) if dbs else "No databases found."
+        
+    elif name == "cpanel_get_disk_usage":
+        res = call_cpanel_api("DiskUsage", "fetch_disk_usage")
+        if res.get("errors"):
+            return f"Error: {res.get('errors')}"
+        data = res.get("data", {})
+        # Simple extraction of disk information
+        return f"Disk usage: {json.dumps(data)}"
+        
+    else:
+        return f"Unknown tool: {name}"
+
+def main():
+    log("cPanel MCP Server started.")
+    # Process JSON-RPC messages from stdin
+    for line in sys.stdin:
+        if not line.strip():
+            continue
+        try:
+            request = json.loads(line)
+            method = request.get("method")
+            req_id = request.get("id")
+            
+            if method == "tools/list":
+                response = {
+                    "jsonrpc": "2.0",
+                    "result": handle_list_tools(),
+                    "id": req_id
+                }
+            elif method == "tools/call":
+                params = request.get("params", {})
+                name = params.get("name")
+                args = params.get("arguments", {})
+                tool_output = handle_call_tool(name, args)
+                response = {
+                    "jsonrpc": "2.0",
+                    "result": {
+                        "content": [
+                            {"type": "text", "text": tool_output}
+                        ]
+                    },
+                    "id": req_id
+                }
+            else:
+                response = {
+                    "jsonrpc": "2.0",
+                    "error": {"code": -32601, "message": "Method not found"},
+                    "id": req_id
+                }
+            
+            sys.stdout.write(json.dumps(response) + "\n")
+            sys.stdout.flush()
+        except Exception as e:
+            log(f"Error parsing request: {e}")
+
+if __name__ == "__main__":
+    main()
