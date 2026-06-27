@@ -26,7 +26,7 @@ class StanworldHomePage extends StatelessWidget {
           ),
           backgroundColor: theme.colorScheme.surface,
           child: Container(
-            constraints: const BoxConstraints(maxWidth: 500),
+            constraints: const BoxConstraints(maxWidth: 550, maxHeight: 600),
             padding: const EdgeInsets.all(40),
             decoration: BoxDecoration(
               border: Border.all(color: theme.colorScheme.outline, width: 1),
@@ -44,28 +44,53 @@ class StanworldHomePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 const Divider(),
-                const SizedBox(height: 24),
-                _buildProductItem(
-                  context,
-                  title: "E-boutique Template",
-                  description: "Template moderne et performant pour le commerce électronique.",
-                  url: "https://ebt.stanworld.org",
+                const SizedBox(height: 20),
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildProductItem(
+                          context,
+                          title: "Colors Notes",
+                          description: "Application de prise de notes et de gestion de palettes chromatiques moderne.",
+                          gitUrl: "https://github.com/Stanworld80/Colors_Notes",
+                        ),
+                        const SizedBox(height: 20),
+                        _buildProductItem(
+                          context,
+                          title: "Finance Manager 2026",
+                          description: "Outil complet de suivi budgétaire et de gestion de finances personnelles.",
+                          gitUrl: "https://github.com/Stanworld80/finance-manager-2026",
+                        ),
+                        const SizedBox(height: 20),
+                        _buildProductItem(
+                          context,
+                          title: "Archipel De la fortune",
+                          description: "Projet de simulation de fortune et de gestion stratégique d'archipel.",
+                          gitUrl: "https://github.com/Stanworld80/ArchipelFortune",
+                        ),
+                        const SizedBox(height: 20),
+                        _buildProductItem(
+                          context,
+                          title: "Very Simple Diary",
+                          description: "Application de journal intime minimaliste, performante et multi-plateforme.",
+                          gitUrl: "https://github.com/Stanworld80/VerySimpleDiary",
+                        ),
+                        const SizedBox(height: 20),
+                        _buildProductItem(
+                          context,
+                          title: "StanMovieDB",
+                          description: "Base de données de films enrichie avec l'API TMDB et intégrée à Firestore.",
+                          gitUrl: "https://github.com/Stanworld80/StanMovieDB",
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 20),
-                _buildProductItem(
-                  context,
-                  title: "Finance Manager",
-                  description: "Solution intuitive de gestion et suivi des finances personnelles.",
-                  url: "https://financemanager.stanworld.org",
-                ),
-                const SizedBox(height: 20),
-                _buildProductItem(
-                  context,
-                  title: "WebBaseWithUser",
-                  description: "Architecture de base pour applications web avec authentification.",
-                  url: "https://webbasewithuser.stanworld.org",
-                ),
-                const SizedBox(height: 32),
+                const Divider(),
+                const SizedBox(height: 16),
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
@@ -97,7 +122,7 @@ class StanworldHomePage extends StatelessWidget {
     BuildContext context, {
     required String title,
     required String description,
-    required String url,
+    required String gitUrl,
   }) {
     final theme = Theme.of(context);
     return Column(
@@ -106,23 +131,38 @@ class StanworldHomePage extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              title,
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
+            Expanded(
+              child: Text(
+                title,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             InkWell(
               onTap: () {
-                Navigator.of(context).pop();
-                _launchUrl(url);
+                _launchUrl(gitUrl);
               },
-              child: Text(
-                "Visiter",
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.secondary,
-                  decoration: TextDecoration.underline,
-                  fontWeight: FontWeight.w600,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      "Git Repo",
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.secondary,
+                        decoration: TextDecoration.underline,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.open_in_new,
+                      size: 14,
+                      color: theme.colorScheme.secondary,
+                    ),
+                  ],
                 ),
               ),
             ),
